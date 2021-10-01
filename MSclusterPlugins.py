@@ -4,7 +4,7 @@
 # Add this file to ~/.phy/plugins/
 #
 # Then open ~/.phy/phy_config.py and add this line:
-# c.TemplateGUI.plugins = ['MountainsortCurationJSONPlugin']
+# c.TemplateGUI.plugins = ['MSCurationTagsPlugin']
 
 import numpy as np
 from phy import IPlugin
@@ -148,7 +148,7 @@ class MSCurationTagsPlugin(IPlugin):
                              key=lambda x: mapnames[x])
         return metric_list
 
-class RyanReduceMetrics(IPlugin):
+class TetrodeMetrics(IPlugin):
     '''
     Remove metrics from phy that I find useless for tetrodes
     '''
