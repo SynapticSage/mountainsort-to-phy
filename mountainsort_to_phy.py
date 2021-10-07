@@ -13,15 +13,23 @@ config = {}
 config['filtered']        = True # Use filt.mda instead of raw.mda?
 config['toleratemissing'] = True # Throw an error for missing tetrodes? Or just skip...
 config['skipproc']        = True # Skip already processed folders?
+
 # Directory to look for tetrodes to send into Phy
 config['parent_path'] = '/Volumes/GenuDrive/RY16_direct/MountainSort/RY16_36.mountain/'
+config['remote_path'] = 'citadel:/volume1/data/Projects/RY16_experiment/RY16_direct/MountainSort/RY16_36.mountain/'
+
+# TODO
+#from localremote import Rsync
+#rsync = Rsync(path_local=config['parent_path'],
+#              path_remote=config['remote_path'],
+#              dry_run=True)
 
 # Store some data from the error
 error = {}
 error['missing'] = []
 error['incompletemda'] = []
 
-for folder in tqdm.tqdm(os.listdir(config['parent_path']), 
+for folder in tqdm.tqdm(os.listdir(config['parent_path']),
                         desc="Process mountainsort folders"):
 
     # Set the full path to the tetrdode folder
