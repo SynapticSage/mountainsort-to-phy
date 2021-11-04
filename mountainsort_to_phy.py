@@ -68,7 +68,7 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
         while not_complete and not geom_empty:
 
             try:
-                mdafile = mda_extract.read_mda_recording(local_path,
+                mda = mda_extract.read_mda_recording(local_path,
                                                          raw_fname=filt_file)
                 not_complete = False
 
@@ -94,13 +94,13 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
             continue
 
         # If we're using filt.mda, the file is already filtered
-        mdafile.annotate(is_filtered=True)
+        mda.annotate(is_filtered=True)
 
     else:
         with open(prv_file, 'r') as F:
             json_dict = json.load(F)
         original_path = json_dict['original_path']
-        mdafile = mda_extract.read_mda_recording(local_path,
+        mda = mda_extract.read_mda_recording(local_path,
                                                  raw_fname=original_path)
 
     # ----------------------------------------------
@@ -108,7 +108,7 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
     # ----------------------------------------------
     print("Getting spikes file")
     samprate = params_dict['samplerate']
-    spikefile = (
+    spikes = (
         mda_extract.read_mda_sorting(firings_file,
                                      sampling_frequency=samprate))
 
@@ -134,7 +134,8 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
     # Extract spike waveform
     # ----------------------
     try:
-        waveform = wave_extract.extract_waveforms(mdafile, spikefile,
+        waveform = wave_extract.extract_waveforms(mda,
+                                                  spikes,
                                                   waveform_file,
                                                   max_spikes_per_unit=None,
                                                   ms_before=3., 
@@ -144,7 +145,7 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
                                                   total_memory='50M',
                                                   progress_bar=True)
     except ValueError:
-        error['incompletemda'] = (mdafile, spikefile, waveformfile)
+        error['incompletemda'] = (mda, spikes, waveform_file)
 
     # ----------------------------------
     # Perform the actual export process
