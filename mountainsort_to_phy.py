@@ -15,8 +15,9 @@ config['toleratemissing'] = True # Throw an error for missing tetrodes? Or just 
 config['skipproc']        = True # Skip already processed folders?
 
 # Directory to look for tetrodes to send into Phy
-config['parent_path'] = '/Volumes/GenuDrive/RY16_direct/MountainSort/RY16_36.mountain/'
-config['remote_path'] = 'citadel:/volume1/data/Projects/RY16_experiment/RY16_direct/MountainSort/RY16_36.mountain/'
+config['parent_path'] = '/mnt/deathstar/RY22_direct/MountainSort/.mountain/'
+#config['parent_path'] = '/Volumes/GenuDrive/RY16_direct/MountainSort/RY16_36.mountain/'
+#config['remote_path'] = 'citadel:/volume1/data/Projects/RY16_experiment/RY16_direct/MountainSort/RY16_36.mountain/'
 
 # TODO
 #from localremote import Rsync
@@ -28,9 +29,13 @@ config['remote_path'] = 'citadel:/volume1/data/Projects/RY16_experiment/RY16_dir
 error = {}
 error['missing'] = []
 error['incompletemda'] = []
+error['phyerror'] = []
 
 for folder in tqdm.tqdm(os.listdir(config['parent_path']),
                         desc="Process mountainsort folders"):
+
+    #if 'nt16' not in folder:
+    #    continue
 
     # Set the full path to the tetrdode folder
     local_path = os.path.join(config['parent_path'], folder)
@@ -108,9 +113,13 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
     # ----------------------------------------------
     print("Getting spikes file")
     samprate = params_dict['samplerate']
-    spikes = (
-        mda_extract.read_mda_sorting(firings_file,
-                                     sampling_frequency=samprate))
+    try :
+        spikes = (
+            mda_extract.read_mda_sorting(firings_file,
+                                         sampling_frequency=samprate))
+    except FileNotFoundError as F:
+        error['missing'].append(firings_file)
+        continue
 
     # Remove any folders and files that will hamper this process
     print("Processing waveform")
@@ -155,4 +164,7 @@ for folder in tqdm.tqdm(os.listdir(config['parent_path']),
     if os.path.exists(phyplace):
         [os.remove(os.path.join(phyplace, f)) for f in os.listdir(phyplace)]
         os.rmdir(phyplace)
-    phyfiles = phy.export_to_phy(waveform, phyplace)
+    try:
+        phyfiles = phy.export_to_phy(waveform, phyplace)
+    except:
+        error['phyerror'].append((waveform, phyplace))
