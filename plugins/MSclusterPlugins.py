@@ -89,6 +89,8 @@ class MSCurationTagsPlugin(IPlugin):
                               name="label"))
             lookup = pd.Series(index=old_index, data=new_index)
             lookup.loc[0] = -1
+            df.loc[:, 'old_ms_id'] = old_index
+            df.loc[:, 'old(overl,burst)'] = df.loc[:,'overlap_cluster'].astype("str") + ", " + df.loc[:,'bursting_parent'].astype("str")
             df.loc[:, 'overlap_cluster'] = lookup.loc[df.overlap_cluster.astype('int')].values
             df.loc[:, 'bursting_parent'] = lookup.loc[df.bursting_parent.astype('int')].values
             df.index = new_index
@@ -163,3 +165,5 @@ class MSCurationSave(IPlugin):
     '''
     from phy import IPlugin
     pass
+
+
